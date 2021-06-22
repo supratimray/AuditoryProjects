@@ -6,7 +6,7 @@ goodDigitalEvents = [];
 goodDigitalTimeStamps = [];
 
 for i=1:length(goodEventNumbers)
-    goodPos = find(digitalEvents==goodEvents(i));
+    goodPos = find(digitalEvents==goodEventNumbers(i));
 
     goodDigitalEvents = cat(2,goodDigitalEvents,digitalEvents(goodPos));
     goodDigitalTimeStamps = cat(2,goodDigitalTimeStamps,digitalTimeStamps(goodPos));
