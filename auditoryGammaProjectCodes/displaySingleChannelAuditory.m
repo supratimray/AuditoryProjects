@@ -345,13 +345,47 @@ for i=1:numRows
                 erp=erp-mean(erp);
                 plot(plotHandles(i,j),timeVals,erp,'color',plotColor);
                 
+            elseif strcmp(analysisType,'TF') || strcmp(analysisType,'deltaTF')
+                
+                Fs = round(1/(timeVals(2)-timeVals(1)));
+                
+                movingwin = [0.3 0.025];
+                %%% params %%%
+                
+                params.tapers   = [1 1];
+                params.pad      = -1;
+                params.Fs       = Fs;
+                params.fpass    = [0 100];
+                params.trialave = 1; %averaging across trials
+                
+                [TfSt,TimeSt,FreqSt] = mtspecgramc(analogData(goodPos,:)',movingwin,params);
+                [TfBl,TimeBl,FreqBl] = mtspecgramc(analogData(goodPosBL,:)',movingwin,params);
+                TimeVals = TimeSt+timeVals(1)-1/Fs;
+                powerSt = log10(TfSt);
+                powerBl = log10(TfBl);
+                PowerChange = powerSt-powerBl;
+                
+                if strcmp(analysisType,'TF')
+                    subplot(plotHandles(i,j))
+                    pcolor(TimeVals, FreqSt,10*(powerSt)');
+                    colormap('jet');
+                    shading interp;
+                end
+                
+                if strcmp(analysisType,'deltaTF')
+                    subplot(plotHandles(i,j))
+                    pcolor(TimeVals, FreqSt,10*(PowerChange)');
+                    colormap('jet'); caxis([-10 10]);
+                    shading interp;
+                end
+                
             else
                 
                 Fs = round(1/(timeVals(2)-timeVals(1)));
                 rangePos = round(diff(stRange)*Fs);
                 stPos = find(timeVals>=stRange(1),1)+ (1:rangePos);
                 xs = 0:1/diff(stRange):Fs-1/diff(stRange);
-            
+                
                 fftST = abs(fft(analogData(goodPos,stPos),[],2));
                 fftBL = abs(fft(analogData(goodPosBL,stPos),[],2));
                 
